@@ -1,45 +1,65 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+import {
+  RecoilRoot,
+  atom,
+  selector,
+  useRecoilState,
+  useRecoilValue,
+} from 'recoil';
+import React from 'react';
+
+const textState = atom({
+  key: 'textState',
+  default: '',
+});
+
+const charCountState = selector({
+  key: 'charCountState',
+  get: ({ get }) => {
+    const text = get(textState);
+
+    return text.length;
+  },
+});
+
+const TextInput = () => {
+  const [text, setText] = useRecoilState(textState);
+
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setText(event.target.value);
+  };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
+    <div>
+      <input type="text" value={text} onChange={onChange} />
+      <br />
+      Echo: {text}
     </div>
-  )
+  );
+};
+
+const CharacterCount = () => {
+  const count = useRecoilValue(charCountState);
+
+  return <>Character Count: {count}</>;
+};
+
+const CharacterCounter = () => {
+  return (
+    <div>
+      <TextInput />
+      <CharacterCount />
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <RecoilRoot>
+      <CharacterCounter />
+    </RecoilRoot>
+  );
 }
 
-export default App
+export default App;
